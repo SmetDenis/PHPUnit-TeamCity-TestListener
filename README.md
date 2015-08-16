@@ -26,7 +26,7 @@ Here is a minimal example of a `composer.json` file:
 ```json
 {
     "require-dev": {
-        "munkie/phpunit-teamcity-testlistener": "dev-master"
+        "smetdenis/phpunit-teamcity-testlistener": "dev-master"
     }
 }
 ```
@@ -37,7 +37,7 @@ Documentation
 Add Build Step in TeamCity:
 
 ```sh
-phpunit --printer PHPUnit\\TeamCity\\TestListener
+phpunit --printer SmetDenis\\TeamCity\\TestListener
 ```
 
 Press "Run..." button in TeamCity.

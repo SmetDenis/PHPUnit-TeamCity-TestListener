@@ -1,15 +1,15 @@
 <?php
 
-namespace PHPUnit\TeamCity;
+namespace SmetDenis\TeamCity;
 
 class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_TestListener
 {
-    const MESSAGE_SUITE_STARTED = 'testSuiteStarted';
+    const MESSAGE_SUITE_STARTED  = 'testSuiteStarted';
     const MESSAGE_SUITE_FINISHED = 'testSuiteFinished';
-    const MESSAGE_TEST_STARTED = 'testStarted';
-    const MESSAGE_TEST_FAILED = 'testFailed';
-    const MESSAGE_TEST_IGNORED = 'testIgnored';
-    const MESSAGE_TEST_FINISHED = 'testFinished';
+    const MESSAGE_TEST_STARTED   = 'testStarted';
+    const MESSAGE_TEST_FAILED    = 'testFailed';
+    const MESSAGE_TEST_IGNORED   = 'testIgnored';
+    const MESSAGE_TEST_FINISHED  = 'testFinished';
 
     const MESSAGE_COMPARISON_FAILURE = 'comparisonFailure';
 
@@ -21,9 +21,9 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
     /**
      * Create and write service message to out
      *
-     * @param string $type
+     * @param string                  $type
      * @param \PHPUnit_Framework_Test $test
-     * @param array $params
+     * @param array                   $params
      */
     protected function writeServiceMessage($type, \PHPUnit_Framework_Test $test, array $params = array())
     {
@@ -32,11 +32,44 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
     }
 
     /**
+     * @param string $input
+     * @return mixed|string
+     */
+    protected function camelCase2Human($input)
+    {
+        $original = $input;
+
+        if (strpos($input, '\\') !== false) {
+            $input = explode('\\', $input);
+            reset($input);
+            $input = end($input);
+        }
+
+        if (!preg_match('#^tests#i', $input)) {
+            $input = preg_replace('#^(test)#i', '', $input);
+        }
+
+        $input  = preg_replace('#(test)$#i', '', $input);
+        $output = preg_replace(array('/(?<=[^A-Z])([A-Z])/', '/(?<=[^0-9])([0-9])/'), ' $0', $input);
+        $output = ucwords($output);
+        $output = trim($output);
+
+        if (strcasecmp($original, $output) === 0) {
+            //return $original;
+        }
+
+        if (strlen($output) == 0) {
+            return $original;
+        }
+        return $output;
+    }
+
+    /**
      * Create service message
      *
-     * @param string $type
+     * @param string                  $type
      * @param \PHPUnit_Framework_Test $test
-     * @param array $params
+     * @param array                   $params
      * @return string
      */
     protected function createServiceMessage($type, \PHPUnit_Framework_Test $test, array $params = array())
@@ -44,15 +77,17 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
         list($usec, $sec) = explode(' ', microtime());
         $msec = floor($usec * 1000);
         $params += array(
-            'name' => $this->getTestName($test),
+            'name'      => $this->getTestName($test),
             'timestamp' => date("Y-m-d\\TH:i:s.{$msec}O", $sec),
-            'flowId' => $this->getFlowId($test)
+            'flowId'    => $this->getFlowId($test),
         );
+
         $message = "##teamcity[{$type}";
         foreach ($params as $name => $value) {
             $message .= ' ' . $name . '=\'' . $this->escapeValue($value) . '\'';
         }
         $message .= "]" . PHP_EOL;
+
         return $message;
     }
 
@@ -64,13 +99,19 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
     {
         if ($test instanceof \PHPUnit_Framework_TestCase) {
             $name = $test->getName();
+
         } elseif ($test instanceof \PHPUnit_Framework_TestSuite) {
             $name = $test->getName();
+
         } elseif ($test instanceof \PHPUnit_Framework_SelfDescribing) {
             $name = $test->toString();
+
         } else {
             $name = get_class($test);
         }
+
+        $name = $this->camelCase2Human($name);
+
         return $name;
     }
 
@@ -98,7 +139,7 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
                 "\n" => "|n",
                 "\r" => "|r",
                 "["  => "|[",
-                "]"  => "|]"
+                "]"  => "|]",
             )
         );
     }
@@ -107,8 +148,8 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
      * An error occurred.
      *
      * @param \PHPUnit_Framework_Test $test
-     * @param \Exception $e
-     * @param float $time
+     * @param \Exception              $e
+     * @param float                   $time
      */
     public function addError(\PHPUnit_Framework_Test $test, \Exception $e, $time)
     {
@@ -121,9 +162,9 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
             $comparisonFailure = $e->getComparisonFailure();
             if (null !== $comparisonFailure) {
                 $params += array(
-                    'type' => self::MESSAGE_COMPARISON_FAILURE,
+                    'type'     => self::MESSAGE_COMPARISON_FAILURE,
                     'expected' => $comparisonFailure->getExpectedAsString(),
-                    'actual' => $comparisonFailure->getActualAsString()
+                    'actual'   => $comparisonFailure->getActualAsString(),
                 );
             }
         }
@@ -139,8 +180,8 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
      * A failure occurred.
      *
      * @param \PHPUnit_Framework_Test|\PHPUnit_Framework_TestCase $test
-     * @param \PHPUnit_Framework_AssertionFailedError $e
-     * @param float $time
+     * @param \PHPUnit_Framework_AssertionFailedError             $e
+     * @param float                                               $time
      */
     public function addFailure(\PHPUnit_Framework_Test $test, \PHPUnit_Framework_AssertionFailedError $e, $time)
     {
@@ -151,8 +192,8 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
      * Incomplete test.
      *
      * @param \PHPUnit_Framework_Test $test
-     * @param \Exception $e
-     * @param float $time
+     * @param \Exception              $e
+     * @param float                   $time
      */
     public function addIncompleteTest(\PHPUnit_Framework_Test $test, \Exception $e, $time)
     {
@@ -169,8 +210,8 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
      * Risky test.
      *
      * @param \PHPUnit_Framework_Test $test
-     * @param \Exception $e
-     * @param float $time
+     * @param \Exception              $e
+     * @param float                   $time
      * @since  Method available since Release 4.0.0
      */
     public function addRiskyTest(\PHPUnit_Framework_Test $test, \Exception $e, $time)
@@ -182,8 +223,8 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
      * Skipped test.
      *
      * @param \PHPUnit_Framework_Test $test
-     * @param \Exception $e
-     * @param float $time
+     * @param \Exception              $e
+     * @param float                   $time
      */
     public function addSkippedTest(\PHPUnit_Framework_Test $test, \Exception $e, $time)
     {
@@ -242,7 +283,7 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
      * A test ended.
      *
      * @param \PHPUnit_Framework_Test $test
-     * @param float $time seconds
+     * @param float                   $time seconds
      */
     public function endTest(\PHPUnit_Framework_Test $test, $time)
     {

@@ -1,5 +1,5 @@
 {
-    "name": "munkie/phpunit-teamcity-testlistener",
+    "name": "smetdenis/phpunit-teamcity-testlistener",
     "description": "PHPUnit test listener for TeamCity CI Server",
     "require": {
         "phpunit/phpunit": ">=3.7,<5.0"
@@ -13,13 +13,14 @@
         {
             "name": "Mikhail Shamin",
             "email": "munk13@gmail.com"
+        },
+        {
+            "name": "SmetDenis",
+            "email": "denis@jbzoo.com"
         }
     ],
     "autoload": {
-        "files": ["src/PHPUnit/TeamCity/TestListener.php"],
-        "psr-4": {
-            "PHPUnit\\TeamCity\\Tests\\": "tests/PHPUnit/TeamCity/Tests"
-        }
+        "classmap": ["src"]
     },
     "config": {
         "bin-dir": "bin"
