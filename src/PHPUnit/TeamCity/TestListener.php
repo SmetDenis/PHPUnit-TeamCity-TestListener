@@ -2,6 +2,8 @@
 
 namespace SmetDenis\TeamCity;
 
+use JBZoo\Utils\Str;
+
 class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_TestListener
 {
     const MESSAGE_SUITE_STARTED  = 'testSuiteStarted';
@@ -37,32 +39,7 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
      */
     protected function camelCase2Human($input)
     {
-        $original = $input;
-
-        if (strpos($input, '\\') !== false) {
-            $input = explode('\\', $input);
-            reset($input);
-            $input = end($input);
-        }
-
-        if (!preg_match('#^tests#i', $input)) {
-            $input = preg_replace('#^(test)#i', '', $input);
-        }
-
-        $input  = preg_replace('#(test)$#i', '', $input);
-        $output = preg_replace(array('/(?<=[^A-Z])([A-Z])/', '/(?<=[^0-9])([0-9])/'), ' $0', $input);
-        $output = ucwords($output);
-        $output = trim($output, '_');
-        $output = trim($output);
-
-        if (strcasecmp($original, $output) === 0) {
-            //return $original;
-        }
-
-        if (strlen($output) == 0) {
-            return $original;
-        }
-        return $output;
+        return Str::testName2Human($input);
     }
 
     /**
