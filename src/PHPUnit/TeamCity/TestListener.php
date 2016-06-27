@@ -52,6 +52,7 @@ class TestListener extends \PHPUnit_Util_Printer implements \PHPUnit_Framework_T
         $input  = preg_replace('#(test)$#i', '', $input);
         $output = preg_replace(array('/(?<=[^A-Z])([A-Z])/', '/(?<=[^0-9])([0-9])/'), ' $0', $input);
         $output = ucwords($output);
+        $output = trim($output, '_');
         $output = trim($output);
 
         if (strcasecmp($original, $output) === 0) {
