@@ -3,7 +3,7 @@
     "description": "PHPUnit test listener for TeamCity CI Server",
     "require": {
         "phpunit/phpunit": ">=3.7,<5.0",
-        "jbzoo/utils"    : "1.x-dev"
+        "jbzoo/utils"    : "^1.7.1"
     },
     "require-dev": {
         "codeception/aspect-mock": "~0.5",
