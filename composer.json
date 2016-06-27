@@ -2,7 +2,8 @@
     "name": "smetdenis/phpunit-teamcity-testlistener",
     "description": "PHPUnit test listener for TeamCity CI Server",
     "require": {
-        "phpunit/phpunit": ">=3.7,<5.0"
+        "phpunit/phpunit": ">=3.7,<5.0",
+        "jbzoo/utils"    : "1.x-dev"
     },
     "require-dev": {
         "codeception/aspect-mock": "~0.5",
